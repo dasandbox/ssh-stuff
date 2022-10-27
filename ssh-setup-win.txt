@@ -1,0 +1,40 @@
+# SSH Client+Server setup steps for Windoze-Windoze
+# Run the following commands from an elevated PowerShell prompt on your server
+
+# Set the sshd service to be started automatically
+Get-Service -Name sshd | Set-Service -StartupType Automatic
+
+# Now start the sshd service
+Start-Service sshd
+
+
+# Run the following command from a PowerShell or cmd prompt on your client:
+ssh-keygen
+
+
+# By default the ssh-agent service is disabled. Configure it to start automatically.
+# Make sure you're running as an Administrator.
+Get-Service ssh-agent | Set-Service -StartupType Automatic
+
+# Start the service
+Start-Service ssh-agent
+
+# This should return a status of Running
+Get-Service ssh-agent
+
+# Now load your key files into ssh-agent
+ssh-add $env:USERPROFILE\.ssh\id_rsa
+
+
+# STANDARD Users
+# Copy the public key into the Servers $HOME\.ssh\authorized_keys
+
+# ADMIN Users
+Using Admin mode, copy public keys to the Servers C:\ProgramData\ssh\administrators_authorized_keys
+# Set ACLs
+icacls.exe "C:\ProgramData\ssh\administrators_authorized_keys" /inheritance:r /grant "Administrators:F" /grant "SYSTEM:F"
+
+
+# Refs
+https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_keymanagement
+https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_server_configuration
